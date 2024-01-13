@@ -32,7 +32,7 @@ def compare_languages(vacancies):
     for language in languages:
         count = 0
         for vacancy in vacancies['items']:
-            if language in (vacancy['name'] or vacancy['snippet']['requirement']):
+            if language in (vacancy['name'] or vacancy['snippet']['requirement'] or vacancy['snippet']['responsibility']):
                 count += 1
         languages_count[language] = count
     print(languages_count)
