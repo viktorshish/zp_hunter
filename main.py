@@ -9,7 +9,9 @@ def get_vacancies():
 
 
 def compare_languages(vacancies):
-    languages = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go', 'TypeScript']
+    languages = ['Python', 'C#', 'C++', 'Java', 'Javascript',
+                 'PHP', 'Ruby','Go', 'TypeScript']
+
     languages_count = {}
     for language in languages:
         count = 0
@@ -29,17 +31,14 @@ def compare_languages(vacancies):
 def find_salary_by_language(vacancies, language):
     for vacancy in vacancies['items']:
         if language.lower() in vacancy['name'].lower():
-            print(f">>>>> {vacancy['salary']} : {vacancy['name']}")
             print(predict_rub_salary(vacancy['salary']))
 
-        elif (vacancy['snippet'].get('requirement') is not None
-              and language.lower() in vacancy['snippet']['requirement'].lower()):
-            print(f">>>>> {vacancy['salary']} : {vacancy['name']} -  {vacancy['snippet']['requirement']}")
+        elif (vacancy['snippet'].get('requirement') is not None and
+              language.lower() in vacancy['snippet']['requirement'].lower()):
             print(predict_rub_salary(vacancy['salary']))
 
-        elif (vacancy['snippet'].get('responsibility') is not None
-              and language.lower() in vacancy['snippet']['responsibility'].lower()):
-            print(f">>>>> {vacancy['salary']} : {vacancy['name']} - {vacancy['snippet']['responsibility']}")
+        elif (vacancy['snippet'].get('responsibility') is not None and
+              language.lower() in vacancy['snippet']['responsibility'].lower()):
             print(predict_rub_salary(vacancy['salary']))
 
 
@@ -57,8 +56,7 @@ def main():
     vacancies = get_vacancies()
     compare_languages(vacancies)
 
-    print(find_salary_by_language(vacancies, 'python'))
-    # predict_rub_salary_by_language(vacancies)
+    find_salary_by_language(vacancies, 'python')
 
 
 if __name__ == '__main__':
