@@ -26,38 +26,39 @@ def compare_languages(vacancies):
     print(languages_count)
 
 
-def get_salary_from_a_language_vacancy(vacancy, language):
-    if language in vacancy['name']:
-        return f"{vacancy['salary']} : {vacancy['name']}"
-    elif (vacancy['snippet'].get('requirement') is not None
-          and language in vacancy['snippet']['requirement']):
-        return f"{vacancy['salary']} : {vacancy['name']} -  {vacancy['snippet']['requirement']}"
-    elif (vacancy['snippet'].get('responsibility') is not None
-          and language in vacancy['snippet']['responsibility']):
-        return f"{vacancy['salary']} : {vacancy['name']} - {vacancy['snippet']['responsibility']}"
-
-
-# def predict_rub_salary(salary):
-#     if salary and 'RUR' in salary['currency']:
-#         if salary.get('from') and salary.get('to'):
-#             return (int(salary['from']) + int(salary['to'])) / 2
-#         elif salary.get('from'):
-#             return int(salary['from']) * 1.2
-#         elif salary.get('to'):
-#             return int(salary['to']) * 0.8
-
-
-def predict_rub_salary_by_language(vacancies):
-    language = 'Python'
+def find_salary_by_language(vacancies, language):
     for vacancy in vacancies['items']:
-        print(get_salary_from_a_language_vacancy(vacancy, language))
+        if language.lower() in vacancy['name'].lower():
+            print(f">>>>> {vacancy['salary']} : {vacancy['name']}")
+            print(predict_rub_salary(vacancy['salary']))
+
+        elif (vacancy['snippet'].get('requirement') is not None
+              and language.lower() in vacancy['snippet']['requirement'].lower()):
+            print(f">>>>> {vacancy['salary']} : {vacancy['name']} -  {vacancy['snippet']['requirement']}")
+            print(predict_rub_salary(vacancy['salary']))
+
+        elif (vacancy['snippet'].get('responsibility') is not None
+              and language.lower() in vacancy['snippet']['responsibility'].lower()):
+            print(f">>>>> {vacancy['salary']} : {vacancy['name']} - {vacancy['snippet']['responsibility']}")
+            print(predict_rub_salary(vacancy['salary']))
+
+
+def predict_rub_salary(salary):
+    if salary and 'RUR' in salary['currency']:
+        if salary.get('from') and salary.get('to'):
+            return (int(salary['from']) + int(salary['to'])) / 2
+        elif salary.get('from'):
+            return int(salary['from']) * 1.2
+        elif salary.get('to'):
+            return int(salary['to']) * 0.8
 
 
 def main():
     vacancies = get_vacancies()
     compare_languages(vacancies)
 
-    predict_rub_salary_by_language(vacancies)
+    print(find_salary_by_language(vacancies, 'python'))
+    # predict_rub_salary_by_language(vacancies)
 
 
 if __name__ == '__main__':
