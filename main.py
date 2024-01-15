@@ -1,25 +1,13 @@
+from pprint import pprint
+
 import requests
 
 
 def get_vacancies(language):
-    payload = {'professional_role': '96', 'area': '1', 'per_page': '20', 'text': language}
+    payload = {'professional_role': '96', 'area': '1', 'text': language}
     response = requests.get('https://api.hh.ru/vacancies', params=payload)
     response.raise_for_status()
     return response.json()
-
-
-def find_salary_by_language(vacancies, language):
-    for vacancy in vacancies['items']:
-        if language.lower() in vacancy['name'].lower():
-            print(predict_rub_salary(vacancy['salary']))
-
-        elif (vacancy['snippet'].get('requirement') is not None and
-              language.lower() in vacancy['snippet']['requirement'].lower()):
-            print(predict_rub_salary(vacancy['salary']))
-
-        elif (vacancy['snippet'].get('responsibility') is not None and
-              language.lower() in vacancy['snippet']['responsibility'].lower()):
-            print(predict_rub_salary(vacancy['salary']))
 
 
 def predict_rub_salary(salary):
@@ -33,14 +21,30 @@ def predict_rub_salary(salary):
     elif salary and not 'RUR' in salary['currency']:
         return None
 
+def count_vacancy_salary(vacancies):
+    count = 0
+    for vacancy in vacancies:
+        if vacancy['salary']:
+            count +=1
+    return count
+
 
 def main():
     languages = ['Python', 'C#', 'C++', 'Java', 'Javascript',
                  'PHP', 'Ruby', 'Go', 'TypeScript']
+
     languages_count = {}
     for language in languages:
-        languages_count[language] = get_vacancies(language)['found']
-    print(languages_count)
+
+        vacancies = get_vacancies(language)
+        average = sum(vacancies.items.salary.values()) / count_vacancy_salary(vacancies['items']
+        languages_count[language] = {
+            'vacansies_found': vacancies['found'],
+            'vacancies_processed': count_vacancy_salary(vacancies['items']),
+            'average_salary': predict_rub_salary(get_vacancies())
+        }
+
+    pprint(languages_count)
 
 
 if __name__ == '__main__':
