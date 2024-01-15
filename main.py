@@ -1,4 +1,5 @@
 from pprint import pprint
+import json
 
 import requests
 
@@ -6,11 +7,19 @@ import requests
 LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
 
 
-def get_vacancies(language):
-    payload = {'professional_role': '96', 'area': '1', 'text': language}
-    response = requests.get('https://api.hh.ru/vacancies', params=payload)
-    response.raise_for_status()
-    return response.json()
+def get_all_vacancies(language):
+    page = 0
+    pages_number = 1
+    vacancies = []
+    while page < pages_number:
+        payload = {'professional_role': '96', 'area': '1', 'text': language, 'page': page}
+        response = requests.get('https://api.hh.ru/vacancies', params=payload)
+        response.raise_for_status()
+        response_json = json.loads(response.text)
+        vacancies.extend(response_json['items'])
+        pages_number = response_json['pages']
+        page += 1
+    return vacancies
 
 
 def predict_rub_salary(salary):
@@ -26,7 +35,7 @@ def predict_rub_salary(salary):
 def main():
     comparison_of_languages_by_vacancies = {}
     for language in LANGUAGES:
-        vacancies = get_vacancies(language)
+        vacancies = get_all_vacancies(language)
         count_vacancies_with_salary = 0
         amount_salary = 0
         for vacancy in vacancies['items']:
