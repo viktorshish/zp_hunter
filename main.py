@@ -1,31 +1,11 @@
 import requests
 
 
-def get_vacancies():
-    payload = {'professional_role': '96', 'area': '1', 'per_page': '100'}
+def get_vacancies(language):
+    payload = {'professional_role': '96', 'area': '1', 'per_page': '20', 'text': language}
     response = requests.get('https://api.hh.ru/vacancies', params=payload)
     response.raise_for_status()
     return response.json()
-
-
-def compare_languages(vacancies):
-    languages = ['Python', 'C#', 'C++', 'Java', 'Javascript',
-                 'PHP', 'Ruby','Go', 'TypeScript']
-
-    languages_count = {}
-    for language in languages:
-        count = 0
-        for vacancy in vacancies['items']:
-            if language in vacancy['name']:
-                count += 1
-            elif (vacancy['snippet'].get('requirement') is not None
-                  and language in vacancy['snippet']['requirement']):
-                count += 1
-            elif (vacancy['snippet'].get('responsibility') is not None
-                  and language in vacancy['snippet']['responsibility']):
-                count += 1
-        languages_count[language] = count
-    print(languages_count)
 
 
 def find_salary_by_language(vacancies, language):
@@ -50,13 +30,17 @@ def predict_rub_salary(salary):
             return int(salary['from']) * 1.2
         elif salary.get('to'):
             return int(salary['to']) * 0.8
+    elif salary and not 'RUR' in salary['currency']:
+        return None
 
 
 def main():
-    vacancies = get_vacancies()
-    compare_languages(vacancies)
-
-    find_salary_by_language(vacancies, 'python')
+    languages = ['Python', 'C#', 'C++', 'Java', 'Javascript',
+                 'PHP', 'Ruby', 'Go', 'TypeScript']
+    languages_count = {}
+    for language in languages:
+        languages_count[language] = get_vacancies(language)['found']
+    print(languages_count)
 
 
 if __name__ == '__main__':
