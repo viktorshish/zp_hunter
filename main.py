@@ -3,6 +3,9 @@ from pprint import pprint
 import requests
 
 
+LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
+
+
 def get_vacancies(language):
     payload = {'professional_role': '96', 'area': '1', 'text': language}
     response = requests.get('https://api.hh.ru/vacancies', params=payload)
@@ -11,40 +14,35 @@ def get_vacancies(language):
 
 
 def predict_rub_salary(salary):
-    if salary and 'RUR' in salary['currency']:
+    if salary and ('RUR' in salary['currency']):
         if salary.get('from') and salary.get('to'):
             return (int(salary['from']) + int(salary['to'])) / 2
         elif salary.get('from'):
             return int(salary['from']) * 1.2
         elif salary.get('to'):
             return int(salary['to']) * 0.8
-    elif salary and not 'RUR' in salary['currency']:
-        return None
-
-def count_vacancy_salary(vacancies):
-    count = 0
-    for vacancy in vacancies:
-        if vacancy['salary']:
-            count +=1
-    return count
 
 
 def main():
-    languages = ['Python', 'C#', 'C++', 'Java', 'Javascript',
-                 'PHP', 'Ruby', 'Go', 'TypeScript']
-
-    languages_count = {}
-    for language in languages:
-
+    comparison_of_languages_by_vacancies = {}
+    for language in LANGUAGES:
         vacancies = get_vacancies(language)
-        average = sum(vacancies.items.salary.values()) / count_vacancy_salary(vacancies['items']
-        languages_count[language] = {
+        count_vacancies_with_salary = 0
+        amount_salary = 0
+        for vacancy in vacancies['items']:
+            predicted_salary = predict_rub_salary(vacancy['salary'])
+            if predicted_salary is not None:
+                amount_salary += predict_rub_salary(vacancy['salary'])
+                count_vacancies_with_salary += 1
+        average = int(amount_salary / count_vacancies_with_salary)
+
+        comparison_of_languages_by_vacancies[language] = {
             'vacansies_found': vacancies['found'],
-            'vacancies_processed': count_vacancy_salary(vacancies['items']),
-            'average_salary': predict_rub_salary(get_vacancies())
+            'vacancies_processed': count_vacancies_with_salary,
+            'average_salary': average
         }
 
-    pprint(languages_count)
+    pprint(comparison_of_languages_by_vacancies)
 
 
 if __name__ == '__main__':
