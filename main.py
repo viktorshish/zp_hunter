@@ -1,7 +1,6 @@
 import requests
 
-
-LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
+import settings
 
 
 def get_all_vacancies(language):
@@ -40,7 +39,7 @@ def predict_rub_salary(salary):
 def calculate_the_average_salary_by_language_hh():
     comparison_of_languages_by_vacancies = {}
 
-    for language in LANGUAGES:
+    for language in settings.LANGUAGES:
         vacancies = get_all_vacancies(language)
 
         count_vacancies_with_salary = 0
@@ -64,6 +63,7 @@ def calculate_the_average_salary_by_language_hh():
 
 def main():
     print(calculate_the_average_salary_by_language_hh())
+
 
 if __name__ == '__main__':
     main()
