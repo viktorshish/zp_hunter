@@ -61,8 +61,21 @@ def calculate_the_average_salary_by_language_hh():
     return comparison_of_languages_by_vacancies
 
 
+def get_vacancies_from_sb():
+    headers = {'X-Api-App-Id': settings.SB_KEY}
+    params = {'town': 4, 'catalogues': 48, }
+    url = 'https://api.superjob.ru/2.2/vacancies/'
+
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    vacancies = response.json()['objects']
+    for vacancy in vacancies:
+        print(f"{vacancy['profession']} --- {vacancy['town']['title']}")
+
+
 def main():
-    print(calculate_the_average_salary_by_language_hh())
+    # print(calculate_the_average_salary_by_language_hh())
+    get_vacancies_from_sb()
 
 
 if __name__ == '__main__':
