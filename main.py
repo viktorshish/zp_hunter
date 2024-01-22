@@ -1,4 +1,6 @@
 import requests
+from terminaltables import AsciiTable
+
 
 import settings
 
@@ -124,10 +126,24 @@ def calculate_the_average_salary_by_language_sj():
     return comparison_of_languages_by_vacancies
 
 
-def main():
-    print(calculate_the_average_salary_by_language_hh())
+def convert_statistics_to_table(statistics):
+    table_data = [
+        ['Язык программирования', 'Вакансий найдено',
+         'Вакансий обработано', 'Средняя зарплата'],
+    ]
 
-    print(calculate_the_average_salary_by_language_sj())
+    for key, value in statistics.items():
+        row = [key, value['vacancies_found'], value['vacancies_processed'], value['average_salary']]
+        table_data.append(row)
+
+    table = AsciiTable(table_data, 'SuperJob Moscow')
+    print(table.table)
+
+
+def main():
+    # print(calculate_the_average_salary_by_language_hh())
+
+    convert_to_table(calculate_the_average_salary_by_language_sj())
 
 
 if __name__ == '__main__':
