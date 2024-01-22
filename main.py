@@ -55,7 +55,10 @@ def calculate_the_average_salary_by_language_hh():
             if predicted_salary is not None:
                 amount_salary += predict_rub_salary_hh(vacancy['salary'])
                 count_vacancies_with_salary += 1
-        average = int(amount_salary / count_vacancies_with_salary)
+        try:
+            average = int(amount_salary / count_vacancies_with_salary)
+        except ZeroDivisionError:
+            average = 0
 
         comparison_of_languages_by_vacancies[language] = {
             'vacancies_found': len(vacancies),
@@ -115,9 +118,9 @@ def calculate_the_average_salary_by_language_sj():
                 amount_salary += predict_rub_salary_sj(vacancy)
                 count_vacancies_with_salary += 1
 
-        if amount_salary:
+        try:
             average = int(amount_salary / count_vacancies_with_salary)
-        else:
+        except ZeroDivisionError:
             average = 0
 
         comparison_of_languages_by_vacancies[language] = {
