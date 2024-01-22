@@ -1,6 +1,7 @@
+import time
+
 import requests
 from terminaltables import AsciiTable
-
 
 import settings
 
@@ -25,6 +26,7 @@ def get_all_vacancies(language):
         if page+1 >= page_response.json()['pages']:
             break
         page += 1
+        time.sleep(1)
     return vacancies
 
 
@@ -126,7 +128,7 @@ def calculate_the_average_salary_by_language_sj():
     return comparison_of_languages_by_vacancies
 
 
-def convert_statistics_to_table(statistics):
+def convert_statistics_to_table(statistics, title):
     table_data = [
         ['Язык программирования', 'Вакансий найдено',
          'Вакансий обработано', 'Средняя зарплата'],
@@ -136,14 +138,14 @@ def convert_statistics_to_table(statistics):
         row = [key, value['vacancies_found'], value['vacancies_processed'], value['average_salary']]
         table_data.append(row)
 
-    table = AsciiTable(table_data, 'SuperJob Moscow')
+    table = AsciiTable(table_data, title)
     print(table.table)
 
 
 def main():
-    # print(calculate_the_average_salary_by_language_hh())
-
-    convert_to_table(calculate_the_average_salary_by_language_sj())
+    convert_statistics_to_table(calculate_the_average_salary_by_language_hh(), 'HeadHunter Moscow')
+    print()
+    convert_statistics_to_table(calculate_the_average_salary_by_language_sj(), 'SuperJob Moscow')
 
 
 if __name__ == '__main__':
