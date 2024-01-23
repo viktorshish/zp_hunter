@@ -134,16 +134,17 @@ def calculate_the_average_salary_by_language_sj(sj_key):
 
 
 def convert_statistics_to_table(statistics, title):
-    table_data = [
+    final_statistic = [
         ['Язык программирования', 'Вакансий найдено',
          'Вакансий обработано', 'Средняя зарплата'],
     ]
 
-    for key, value in statistics.items():
-        row = [key, value['vacancies_found'], value['vacancies_processed'], value['average_salary']]
-        table_data.append(row)
+    for language, statistic in statistics.items():
+        row = [language, statistic['vacancies_found'],
+               statistic['vacancies_processed'], statistic['average_salary']]
+        final_statistic.append(row)
 
-    table = AsciiTable(table_data, title)
+    table = AsciiTable(final_statistic, title)
     print(table.table)
 
 
