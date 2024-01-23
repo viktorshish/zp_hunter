@@ -8,7 +8,7 @@ from terminaltables import AsciiTable
 LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
 
 
-def get_all_vacancies(language):
+def get_vacancies_hh(language):
     vacancies = []
     page = 0
 
@@ -42,32 +42,27 @@ def predict_rub_salary_hh(salary):
             return int(salary['to']) * 0.8
 
 
-def calculate_the_average_salary_by_language_hh():
-    comparison_of_languages_by_vacancies = {}
+def calculate_the_average_salary_for_language_hh(vacancies):
+    count_vacancies_with_salary = 0
+    amount_salary = 0
 
-    for language in LANGUAGES:
-        vacancies = get_all_vacancies(language)
+    for vacancy in vacancies:
+        predicted_salary = predict_rub_salary_hh(vacancy['salary'])
 
-        count_vacancies_with_salary = 0
-        amount_salary = 0
+        if predicted_salary is not None:
+            amount_salary += predict_rub_salary_hh(vacancy['salary'])
+            count_vacancies_with_salary += 1
 
-        for vacancy in vacancies:
-            predicted_salary = predict_rub_salary_hh(vacancy['salary'])
+    try:
+        average = int(amount_salary / count_vacancies_with_salary)
+    except ZeroDivisionError:
+        average = 0
 
-            if predicted_salary is not None:
-                amount_salary += predict_rub_salary_hh(vacancy['salary'])
-                count_vacancies_with_salary += 1
-        try:
-            average = int(amount_salary / count_vacancies_with_salary)
-        except ZeroDivisionError:
-            average = 0
-
-        comparison_of_languages_by_vacancies[language] = {
-            'vacancies_found': len(vacancies),
-            'vacancies_processed': count_vacancies_with_salary,
-            'average_salary': average
-        }
-    return comparison_of_languages_by_vacancies
+    return {
+        'vacancies_found': len(vacancies),
+        'vacancies_processed': count_vacancies_with_salary,
+        'average_salary': average
+    }
 
 
 def get_all_vacancies_from_sj(language, sj_key):
@@ -145,7 +140,7 @@ def convert_statistics_to_table(statistics, title):
         final_statistic.append(row)
 
     table = AsciiTable(final_statistic, title)
-    print(table.table)
+    return table.table
 
 
 def main():
@@ -153,9 +148,16 @@ def main():
     env.read_env()
     sj_key = env.str("SJ_KEY")
 
-    convert_statistics_to_table(calculate_the_average_salary_by_language_hh(), 'HeadHunter Moscow')
-    print()
-    convert_statistics_to_table(calculate_the_average_salary_by_language_sj(sj_key), 'SuperJob Moscow')
+    comparison_of_languages_by_vacancies_hh = {}
+    for language in LANGUAGES:
+        vacancies_hh = get_vacancies_hh(language)
+        average_salary_hh = calculate_the_average_salary_for_language_hh(vacancies_hh)
+        comparison_of_languages_by_vacancies_hh['language'] = average_salary_hh
+
+    print(convert_statistics_to_table(comparison_of_languages_by_vacancies_hh, 'HeadHunter Moscow'))
+
+    sj_statistic = calculate_the_average_salary_by_language_sj(sj_key)
+    print(convert_statistics_to_table(sj_statistic, 'SuperJob Moscow'))
 
 
 if __name__ == '__main__':
