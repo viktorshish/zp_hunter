@@ -107,7 +107,6 @@ def calculate_the_average_salary_by_language_sj(sj_key):
 
         count_vacancies_with_salary = 0
         amount_salary = 0
-
         for vacancy in vacancies:
             predicted_salary = predict_rub_salary_sj(vacancy)
 
@@ -134,11 +133,14 @@ def convert_statistics_to_table(statistics, title):
          'Вакансий обработано', 'Средняя зарплата'],
     ]
 
-    for language, statistic in statistics.items():
-        row = [language, statistic['vacancies_found'],
-               statistic['vacancies_processed'], statistic['average_salary']]
+    for language, language_statistics in statistics.items():
+        row = [
+            language,
+            language_statistics['vacancies_found'],
+            language_statistics['vacancies_processed'],
+            language_statistics['average_salary']
+        ]
         final_statistic.append(row)
-
     table = AsciiTable(final_statistic, title)
     return table.table
 
