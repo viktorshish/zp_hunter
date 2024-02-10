@@ -6,18 +6,23 @@ from terminaltables import AsciiTable
 
 
 LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
+ID_HH_PROGRAMMER_DEVELOPER = '96'
+ID_HH_MOSCOW = '1'
+ID_SJ_PROGRAMMER_DEVELOPER = 33
+ID_SJ_MOSCOW = 4
 
 
 def get_vacancies_hh(language):
     vacancies = []
     page = 0
     while True:
+        vacancies_on_the_page = 100
         params = {
-            'professional_role': '96',
-            'area': '1',
+            'professional_role': ID_HH_PROGRAMMER_DEVELOPER,
+            'area': ID_HH_MOSCOW,
             'text': language,
             'page': page,
-            'per_page': 100
+            'per_page': vacancies_on_the_page
         }
         url = 'https://api.hh.ru/vacancies'
 
@@ -70,8 +75,8 @@ def get_vacancies_sj(language, sj_key):
     while True:
         headers = {'X-Api-App-Id': sj_key}
         params = {
-            'town': 4,
-            'catalogues': 33,
+            'town': ID_SJ_MOSCOW,
+            'catalogues': ID_SJ_PROGRAMMER_DEVELOPER,
             'keyword': language,
             'page': page
         }
