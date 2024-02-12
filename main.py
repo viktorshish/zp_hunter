@@ -12,27 +12,32 @@ ID_SJ_PROGRAMMER_DEVELOPER = 33
 ID_SJ_MOSCOW = 4
 
 
+def get_hh_vacancies_response(page, language):
+    vacancies_on_the_page = 100
+    params = {
+        'professional_role': ID_HH_PROGRAMMER_DEVELOPER,
+        'area': ID_HH_MOSCOW,
+        'text': language,
+        'page': page,
+        'per_page': vacancies_on_the_page,
+        'currency': 'RUR'
+    }
+    url = 'https://api.hh.ru/vacancies'
+
+    page_response = requests.get(url, params=params)
+    page_response.raise_for_status()
+    return page_response.json()
+
+
 def get_vacancies_hh(language):
     vacancies = []
     page = 0
     while True:
-        vacancies_on_the_page = 100
-        params = {
-            'professional_role': ID_HH_PROGRAMMER_DEVELOPER,
-            'area': ID_HH_MOSCOW,
-            'text': language,
-            'page': page,
-            'per_page': vacancies_on_the_page,
-            'currency': 'RUR'
-        }
-        url = 'https://api.hh.ru/vacancies'
-
-        page_response = requests.get(url, params=params)
-        page_response.raise_for_status()
-        page_vacancies = page_response.json()['items']
+        page_response = get_hh_vacancies_response(page, language)
+        page_vacancies = page_response['items']
         vacancies.extend(page_vacancies)
 
-        if page+1 >= page_response.json()['pages']:
+        if page+1 >= page_response['pages']:
             break
         page += 1
         time.sleep(5)
@@ -59,7 +64,7 @@ def predict_rub_salary(vacancy):
         return None
 
 
-def calculate_the_average_salary_for_language(vacancies):
+def calculate_the_average_salary_for_language(vacancies, found_vacancies):
     count_vacancies_with_salary = 0
     amount_salary = 0
     for vacancy in vacancies:
@@ -74,31 +79,36 @@ def calculate_the_average_salary_for_language(vacancies):
     except ZeroDivisionError:
         average = 0
     return {
-        'vacancies_found': len(vacancies),
+        'vacancies_found': found_vacancies,
         'vacancies_processed': count_vacancies_with_salary,
         'average_salary': average
     }
+
+
+def get_sj_vacancies_response(page, language, sj_key):
+    headers = {'X-Api-App-Id': sj_key}
+    params = {
+        'town': ID_SJ_MOSCOW,
+        'catalogues': ID_SJ_PROGRAMMER_DEVELOPER,
+        'keyword': language,
+        'page': page
+    }
+    url = 'https://api.superjob.ru/2.2/vacancies/'
+
+    page_response = requests.get(url, headers=headers, params=params)
+    page_response.raise_for_status()
+    return page_response.json()
 
 
 def get_vacancies_sj(language, sj_key):
     vacancies = []
     page = 0
     while True:
-        headers = {'X-Api-App-Id': sj_key}
-        params = {
-            'town': ID_SJ_MOSCOW,
-            'catalogues': ID_SJ_PROGRAMMER_DEVELOPER,
-            'keyword': language,
-            'page': page
-        }
-        url = 'https://api.superjob.ru/2.2/vacancies/'
-
-        page_response = requests.get(url, headers=headers, params=params)
-        page_response.raise_for_status()
-        page_vacancies = page_response.json()['objects']
+        page_response = get_sj_vacancies_response(page, language, sj_key)
+        page_vacancies = page_response['objects']
         vacancies.extend(page_vacancies)
 
-        if not page_response.json()['more']:
+        if not page_response['more']:
             break
         page += 1
     return vacancies
@@ -131,12 +141,14 @@ def main():
     comparison_of_languages_by_vacancies_hh = {}
     comparison_of_languages_by_vacancies_sj = {}
     for language in LANGUAGES:
+        hh_found_vacancies = get_hh_vacancies_response(0, language)['found']
         vacancies_hh = get_vacancies_hh(language)
-        average_salaries_hh = calculate_the_average_salary_for_language(vacancies_hh)
+        average_salaries_hh = calculate_the_average_salary_for_language(vacancies_hh, hh_found_vacancies)
         comparison_of_languages_by_vacancies_hh[language] = average_salaries_hh
 
+        sj_found_vacancies = get_sj_vacancies_response(0, language, sj_key)['total']
         vacancies_sj = get_vacancies_sj(language, sj_key)
-        average_salaries_sj = calculate_the_average_salary_for_language(vacancies_sj)
+        average_salaries_sj = calculate_the_average_salary_for_language(vacancies_sj, sj_found_vacancies)
         comparison_of_languages_by_vacancies_sj[language] = average_salaries_sj
 
     print(convert_statistics_to_table(comparison_of_languages_by_vacancies_hh, 'HeadHunter Moscow'))
