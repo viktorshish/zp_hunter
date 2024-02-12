@@ -6,20 +6,20 @@ from terminaltables import AsciiTable
 
 
 LANGUAGES = ['Python', 'C#', 'C++', 'Java', 'Javascript', 'PHP', 'Ruby', 'Go']
-ID_HH_PROGRAMMER_DEVELOPER = '96'
-ID_HH_MOSCOW = '1'
-ID_SJ_PROGRAMMER_DEVELOPER = 33
-ID_SJ_MOSCOW = 4
+HH_PROGRAMMER_DEVELOPER_ID = '96'
+HH_MOSCOW_ID = '1'
+SJ_PROGRAMMER_DEVELOPER_ID = 33
+SJ_MOSCOW_ID = 4
 
 
 def get_hh_vacancies_response(page, language):
-    vacancies_on_the_page = 100
+    page_vacancies = 100
     params = {
-        'professional_role': ID_HH_PROGRAMMER_DEVELOPER,
-        'area': ID_HH_MOSCOW,
+        'professional_role': HH_PROGRAMMER_DEVELOPER_ID,
+        'area': HH_MOSCOW_ID,
         'text': language,
         'page': page,
-        'per_page': vacancies_on_the_page,
+        'per_page': page_vacancies,
         'currency': 'RUR'
     }
     url = 'https://api.hh.ru/vacancies'
@@ -138,8 +138,8 @@ def main():
     env.read_env()
     sj_key = env.str("SJ_KEY")
 
-    comparison_of_languages_by_vacancies_hh = {}
-    comparison_of_languages_by_vacancies_sj = {}
+    comparison_vacancies_hh = {}
+    comparison_vacancies_sj = {}
     for language in LANGUAGES:
         hh_found_vacancies = get_hh_vacancies_response(0, language)['found']
         vacancies_hh = get_vacancies_hh(language)
