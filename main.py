@@ -65,8 +65,8 @@ def calculate_the_average_salary_for_language(vacancies):
     for vacancy in vacancies:
         predicted_salary = predict_rub_salary(vacancy)
 
-        if predicted_salary is not None:
-            amount_salary += predict_rub_salary(vacancy)
+        if predicted_salary:
+            amount_salary += predicted_salary
             count_vacancies_with_salary += 1
 
     try:
